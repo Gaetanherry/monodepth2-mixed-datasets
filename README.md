@@ -1,4 +1,13 @@
-# Monodepth2
+# Mixing Datasets for Self-Supervised Monocular Depth Estimation
+
+Self-supervised learning has emerged as an efficient method for training models to perform monocular depth estimation, without requiring per-pixel ground-truth depth data. On the KITTI dataset, Godard et al. has obtained state-of-the-art results, however the model does not cope well with other environments.
+With our paper, we show that their architecture is powerful, and can be used for predicting depth on wider environments if we train it with other datasets. Especially, we implement a dataset mixing strategy for multi-task learning in order to get more robust results on all environments.
+
+We forked the monodepth2 pytorch implementation and added our features on top of it. Training and testing are made the same way, we added support for the tum, eurocmav, icl, and a naive mixing of them (dataset=naive_mixing).
+
+For more details, see paper.pdf
+
+# Monodepth2 - original repository
 
 This is the reference PyTorch implementation for training and testing depth estimation models using the method described in
 

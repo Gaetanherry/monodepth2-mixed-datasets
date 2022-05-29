@@ -1,0 +1,118 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BackprojectDepth	layers.py	/^class BackprojectDepth(nn.Module):$/;"	c
+Conv3x3	layers.py	/^class Conv3x3(nn.Module):$/;"	c
+ConvBlock	layers.py	/^class ConvBlock(nn.Module):$/;"	c
+DepthDecoder	networks/depth_decoder.py	/^class DepthDecoder(nn.Module):$/;"	c
+KITTIDataset	datasets/kitti_dataset.py	/^class KITTIDataset(MonoDataset):$/;"	c
+KITTIDepthDataset	datasets/kitti_dataset.py	/^class KITTIDepthDataset(KITTIDataset):$/;"	c
+KITTIOdomDataset	datasets/kitti_dataset.py	/^class KITTIOdomDataset(KITTIDataset):$/;"	c
+KITTIRAWDataset	datasets/kitti_dataset.py	/^class KITTIRAWDataset(KITTIDataset):$/;"	c
+MonoDataset	datasets/mono_dataset.py	/^class MonoDataset(data.Dataset):$/;"	c
+MonodepthOptions	options.py	/^class MonodepthOptions:$/;"	c
+PoseCNN	networks/pose_cnn.py	/^class PoseCNN(nn.Module):$/;"	c
+PoseDecoder	networks/pose_decoder.py	/^class PoseDecoder(nn.Module):$/;"	c
+Project3D	layers.py	/^class Project3D(nn.Module):$/;"	c
+ResNetMultiImageInput	networks/resnet_encoder.py	/^class ResNetMultiImageInput(models.ResNet):$/;"	c
+ResnetEncoder	networks/resnet_encoder.py	/^class ResnetEncoder(nn.Module):$/;"	c
+SSIM	layers.py	/^class SSIM(nn.Module):$/;"	c
+STEREO_SCALE_FACTOR	evaluate_depth.py	/^STEREO_SCALE_FACTOR = 5.4$/;"	v
+Trainer	trainer.py	/^class Trainer:$/;"	c
+__getitem__	datasets/mono_dataset.py	/^    def __getitem__(self, index):$/;"	m	class:MonoDataset	file:
+__init__	datasets/kitti_dataset.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:KITTIDataset
+__init__	datasets/kitti_dataset.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:KITTIDepthDataset
+__init__	datasets/kitti_dataset.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:KITTIOdomDataset
+__init__	datasets/kitti_dataset.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:KITTIRAWDataset
+__init__	datasets/mono_dataset.py	/^    def __init__(self,$/;"	m	class:MonoDataset
+__init__	layers.py	/^    def __init__(self):$/;"	m	class:SSIM
+__init__	layers.py	/^    def __init__(self, batch_size, height, width):$/;"	m	class:BackprojectDepth
+__init__	layers.py	/^    def __init__(self, batch_size, height, width, eps=1e-7):$/;"	m	class:Project3D
+__init__	layers.py	/^    def __init__(self, in_channels, out_channels):$/;"	m	class:ConvBlock
+__init__	layers.py	/^    def __init__(self, in_channels, out_channels, use_refl=True):$/;"	m	class:Conv3x3
+__init__	networks/depth_decoder.py	/^    def __init__(self, num_ch_enc, scales=range(4), num_output_channels=1, use_skips=True):$/;"	m	class:DepthDecoder
+__init__	networks/pose_cnn.py	/^    def __init__(self, num_input_frames):$/;"	m	class:PoseCNN
+__init__	networks/pose_decoder.py	/^    def __init__(self, num_ch_enc, num_input_features, num_frames_to_predict_for=None, stride=1):$/;"	m	class:PoseDecoder
+__init__	networks/resnet_encoder.py	/^    def __init__(self, block, layers, num_classes=1000, num_input_images=1):$/;"	m	class:ResNetMultiImageInput
+__init__	networks/resnet_encoder.py	/^    def __init__(self, num_layers, pretrained, num_input_images=1):$/;"	m	class:ResnetEncoder
+__init__	options.py	/^    def __init__(self):$/;"	m	class:MonodepthOptions
+__init__	trainer.py	/^    def __init__(self, options):$/;"	m	class:Trainer
+__len__	datasets/mono_dataset.py	/^    def __len__(self):$/;"	m	class:MonoDataset	file:
+args	test_simple.py	/^    args = parse_args()$/;"	v
+batch_post_process_disparity	evaluate_depth.py	/^def batch_post_process_disparity(l_disp, r_disp):$/;"	f
+check_depth	datasets/kitti_dataset.py	/^    def check_depth(self):$/;"	m	class:KITTIDataset
+check_depth	datasets/mono_dataset.py	/^    def check_depth(self):$/;"	m	class:MonoDataset
+check_file_matches_md5	utils.py	/^    def check_file_matches_md5(checksum, fpath):$/;"	f	function:download_model_if_doesnt_exist
+compute_ate	evaluate_pose.py	/^def compute_ate(gtruth_xyz, pred_xyz_o):$/;"	f
+compute_depth_errors	layers.py	/^def compute_depth_errors(gt, pred):$/;"	f
+compute_depth_losses	trainer.py	/^    def compute_depth_losses(self, inputs, outputs, losses):$/;"	m	class:Trainer
+compute_errors	evaluate_depth.py	/^def compute_errors(gt, pred):$/;"	f
+compute_losses	trainer.py	/^    def compute_losses(self, inputs, outputs):$/;"	m	class:Trainer
+compute_reprojection_loss	trainer.py	/^    def compute_reprojection_loss(self, pred, target):$/;"	m	class:Trainer
+convertImage	kitti_data/convert.py	/^def convertImage(folder):$/;"	f
+disp_to_depth	layers.py	/^def disp_to_depth(disp, min_depth, max_depth):$/;"	f
+download_model_if_doesnt_exist	utils.py	/^def download_model_if_doesnt_exist(model_name):$/;"	f
+dump_xyz	evaluate_pose.py	/^def dump_xyz(source_to_target_transformations):$/;"	f
+evaluate	evaluate_depth.py	/^def evaluate(opt):$/;"	f
+evaluate	evaluate_pose.py	/^def evaluate(opt):$/;"	f
+export_gt_depths_kitti	export_gt_depth.py	/^def export_gt_depths_kitti():$/;"	f
+file_dir	options.py	/^file_dir = os.path.dirname(__file__)  # the directory that options.py resides in$/;"	v
+forward	layers.py	/^    def forward(self, depth, inv_K):$/;"	m	class:BackprojectDepth
+forward	layers.py	/^    def forward(self, points, K, T):$/;"	m	class:Project3D
+forward	layers.py	/^    def forward(self, x):$/;"	m	class:Conv3x3
+forward	layers.py	/^    def forward(self, x):$/;"	m	class:ConvBlock
+forward	layers.py	/^    def forward(self, x, y):$/;"	m	class:SSIM
+forward	networks/depth_decoder.py	/^    def forward(self, input_features):$/;"	m	class:DepthDecoder
+forward	networks/pose_cnn.py	/^    def forward(self, out):$/;"	m	class:PoseCNN
+forward	networks/pose_decoder.py	/^    def forward(self, input_features):$/;"	m	class:PoseDecoder
+forward	networks/resnet_encoder.py	/^    def forward(self, input_image):$/;"	m	class:ResnetEncoder
+generate_depth_map	kitti_utils.py	/^def generate_depth_map(calib_dir, velo_filename, cam=2, vel_depth=False):$/;"	f
+generate_images_pred	trainer.py	/^    def generate_images_pred(self, inputs, outputs):$/;"	m	class:Trainer
+get_color	datasets/kitti_dataset.py	/^    def get_color(self, folder, frame_index, side, do_flip):$/;"	m	class:KITTIDataset
+get_color	datasets/mono_dataset.py	/^    def get_color(self, folder, frame_index, side, do_flip):$/;"	m	class:MonoDataset
+get_depth	datasets/kitti_dataset.py	/^    def get_depth(self, folder, frame_index, side, do_flip):$/;"	m	class:KITTIDepthDataset
+get_depth	datasets/kitti_dataset.py	/^    def get_depth(self, folder, frame_index, side, do_flip):$/;"	m	class:KITTIRAWDataset
+get_depth	datasets/mono_dataset.py	/^    def get_depth(self, folder, frame_index, side, do_flip):$/;"	m	class:MonoDataset
+get_image_path	datasets/kitti_dataset.py	/^    def get_image_path(self, folder, frame_index, side):$/;"	m	class:KITTIDepthDataset
+get_image_path	datasets/kitti_dataset.py	/^    def get_image_path(self, folder, frame_index, side):$/;"	m	class:KITTIOdomDataset
+get_image_path	datasets/kitti_dataset.py	/^    def get_image_path(self, folder, frame_index, side):$/;"	m	class:KITTIRAWDataset
+get_smooth_loss	layers.py	/^def get_smooth_loss(disp, img):$/;"	f
+get_translation_matrix	layers.py	/^def get_translation_matrix(translation_vector):$/;"	f
+load_model	trainer.py	/^    def load_model(self):$/;"	m	class:Trainer
+load_velodyne_points	kitti_utils.py	/^def load_velodyne_points(filename):$/;"	f
+log	trainer.py	/^    def log(self, mode, inputs, outputs, losses):$/;"	m	class:Trainer
+log_time	trainer.py	/^    def log_time(self, batch_idx, duration, loss):$/;"	m	class:Trainer
+normalize_image	utils.py	/^def normalize_image(x):$/;"	f
+options	evaluate_depth.py	/^    options = MonodepthOptions()$/;"	v
+options	evaluate_pose.py	/^    options = MonodepthOptions()$/;"	v
+options	train.py	/^options = MonodepthOptions()$/;"	v
+opts	train.py	/^opts = options.parse()$/;"	v
+parse	options.py	/^    def parse(self):$/;"	m	class:MonodepthOptions
+parse_args	test_simple.py	/^def parse_args():$/;"	f
+pil_loader	datasets/mono_dataset.py	/^def pil_loader(path):$/;"	f
+predict_poses	trainer.py	/^    def predict_poses(self, inputs, features):$/;"	m	class:Trainer
+preprocess	datasets/mono_dataset.py	/^    def preprocess(self, inputs, color_aug):$/;"	m	class:MonoDataset
+process_batch	trainer.py	/^    def process_batch(self, inputs):$/;"	m	class:Trainer
+read_calib_file	kitti_utils.py	/^def read_calib_file(path):$/;"	f
+readlines	utils.py	/^def readlines(filename):$/;"	f
+resnet_multiimage_input	networks/resnet_encoder.py	/^def resnet_multiimage_input(num_layers, pretrained=False, num_input_images=1):$/;"	f
+root_dir	kitti_data/convert.py	/^root_dir = '2011_09_26'$/;"	v
+rot_from_axisangle	layers.py	/^def rot_from_axisangle(vec):$/;"	f
+run_epoch	trainer.py	/^    def run_epoch(self):$/;"	m	class:Trainer
+save_model	trainer.py	/^    def save_model(self):$/;"	m	class:Trainer
+save_opts	trainer.py	/^    def save_opts(self):$/;"	m	class:Trainer
+sec_to_hm	utils.py	/^def sec_to_hm(t):$/;"	f
+sec_to_hm_str	utils.py	/^def sec_to_hm_str(t):$/;"	f
+set_eval	trainer.py	/^    def set_eval(self):$/;"	m	class:Trainer
+set_train	trainer.py	/^    def set_train(self):$/;"	m	class:Trainer
+splits_dir	evaluate_depth.py	/^splits_dir = os.path.join(os.path.dirname(__file__), "splits")$/;"	v
+sub2ind	kitti_utils.py	/^def sub2ind(matrixSize, rowSub, colSub):$/;"	f
+test_simple	test_simple.py	/^def test_simple(args):$/;"	f
+train	trainer.py	/^    def train(self):$/;"	m	class:Trainer
+trainer	train.py	/^    trainer = Trainer(opts)$/;"	v
+transformation_from_parameters	layers.py	/^def transformation_from_parameters(axisangle, translation, invert=False):$/;"	f
+upsample	layers.py	/^def upsample(x):$/;"	f
+val	trainer.py	/^    def val(self):$/;"	m	class:Trainer

@@ -24,13 +24,19 @@ from layers import *
 import datasets
 import networks
 from IPython import embed
-
+from torch.utils.data.dataset import ConcatDataset
+from multi_task_batch_scheduler import BatchSchedulerSampler
 
 class Trainer:
     def __init__(self, options):
         self.opt = options
         self.log_path = os.path.join(self.opt.log_dir, self.opt.model_name)
-
+        mixing = False
+        
+        if "naive_mix" in self.opt.dataset:
+            mixing = True
+            self.opt.height = 480
+            self.opt.width = 640
         # checking height and width are multiples of 32
         assert self.opt.height % 32 == 0, "'height' must be a multiple of 32"
         assert self.opt.width % 32 == 0, "'width' must be a multiple of 32"
@@ -109,33 +115,136 @@ class Trainer:
         print("Training model named:\n  ", self.opt.model_name)
         print("Models and tensorboard events files are saved to:\n  ", self.opt.log_dir)
         print("Training is using:\n  ", self.device)
+        print("On dataset ", self.opt.dataset)
 
         # data
-        datasets_dict = {"kitti": datasets.KITTIRAWDataset,
-                         "kitti_odom": datasets.KITTIOdomDataset}
-        self.dataset = datasets_dict[self.opt.dataset]
-
-        fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
-
-        train_filenames = readlines(fpath.format("train"))
-        val_filenames = readlines(fpath.format("val"))
         img_ext = '.png' if self.opt.png else '.jpg'
 
-        num_train_samples = len(train_filenames)
-        self.num_total_steps = num_train_samples // self.opt.batch_size * self.opt.num_epochs
+        datasets_to_treat = self.opt.dataset
+        datasets_tuples = []
+        if "naive_mix" in self.opt.dataset:
+            datasets_to_treat = "kitti eurocmav tum icl"
 
-        train_dataset = self.dataset(
-            self.opt.data_path, train_filenames, self.opt.height, self.opt.width,
+        num_train_samples = 0
+        if "kitti" in datasets_to_treat:
+            fpath = os.path.join(os.path.dirname(__file__), "splits", self.opt.split, "{}_files.txt")
+
+            train_filenames = readlines(fpath.format("train"))
+            val_filenames = readlines(fpath.format("val"))
+
+            dataset_folder = os.path.join(self.opt.data_path,"kitti_data")
+
+            num_train_samples = len(train_filenames)
+
+            if "kitti_odom" in datasets_to_treat:
+                train_dataset = datasets.KITTIOdomDataset(
+                dataset_folder, train_filenames, self.opt.height, self.opt.width,
+                self.opt.frame_ids, 4, is_train=True, img_ext=img_ext)
+                val_dataset = datasets.KITTIOdomDataset(
+                dataset_folder, val_filenames, self.opt.height, self.opt.width,
+                self.opt.frame_ids, 4, is_train=False, img_ext=img_ext)
+            else:
+                train_dataset = datasets.KITTIRAWDataset(
+                dataset_folder, train_filenames, self.opt.height, self.opt.width,
+                self.opt.frame_ids, 4, is_train=True, img_ext=img_ext, mixing=mixing)
+                val_dataset = datasets.KITTIRAWDataset(
+                dataset_folder, val_filenames, self.opt.height, self.opt.width,
+                self.opt.frame_ids, 4, is_train=False, img_ext=img_ext, mixing=mixing)
+
+            datasets_tuples.append((train_dataset,val_dataset))
+
+        if "tum" in datasets_to_treat:
+            train_filenames = []
+            val_filenames = []
+            dataset_folder = os.path.join(self.opt.data_path,"TUM")
+            for folder in os.listdir(dataset_folder):
+                if "freiburg3" in folder:
+                    fpath = os.path.join(os.path.dirname(__file__), dataset_folder, folder, "new_rgb.txt")
+
+                    newlines = readlines(fpath)[1:-1]
+                    newlines = [[line.split(' ')[0],folder+'/rgb',line.split(' ')[1]] for line in newlines]
+                    if "validation" in folder:
+                        val_filenames = [*val_filenames, *newlines]
+                    else:    
+                        train_filenames = [*train_filenames, *newlines]
+            
+            num_train_samples = len(train_filenames) if num_train_samples == 0 or num_train_samples > len(train_filenames) else num_train_samples
+            train_dataset = datasets.TUMDataset(
+            dataset_folder, train_filenames, self.opt.height, self.opt.width,
             self.opt.frame_ids, 4, is_train=True, img_ext=img_ext)
-        self.train_loader = DataLoader(
-            train_dataset, self.opt.batch_size, True,
-            num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
-        val_dataset = self.dataset(
-            self.opt.data_path, val_filenames, self.opt.height, self.opt.width,
+            val_dataset = datasets.TUMDataset(
+            dataset_folder, val_filenames, self.opt.height, self.opt.width,
             self.opt.frame_ids, 4, is_train=False, img_ext=img_ext)
-        self.val_loader = DataLoader(
-            val_dataset, self.opt.batch_size, True,
-            num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+
+            datasets_tuples.append((train_dataset,val_dataset))
+
+        if "eurocmav" in datasets_to_treat:
+            train_filenames = []
+            val_filenames = []
+            dataset_folder = os.path.join(self.opt.data_path,"EuRoCMAV")
+            for folder in os.listdir(dataset_folder):
+                if ".py" not in folder:
+                    fpath = os.path.join(os.path.dirname(__file__), dataset_folder, folder, "mav0/cam0/new_data.txt")
+                    newlines = readlines(fpath)[1:-1]
+                    newlines = [[line.split(' ')[0],folder+'mav0/cam0/data',line.split(' ')[1]] for line in newlines]
+                    if "validation" in folder:
+                        val_filenames = [*val_filenames, *newlines]
+                    else:    
+                        train_filenames = [*train_filenames, *newlines]
+            
+            num_train_samples = len(train_filenames) if num_train_samples == 0 or num_train_samples > len(train_filenames) else num_train_samples
+            train_dataset = datasets.EurocMAVDataset(
+            dataset_folder, train_filenames, self.opt.height, self.opt.width,
+            self.opt.frame_ids, 4, is_train=True, img_ext=img_ext, mixing=mixing)
+            val_dataset = datasets.EurocMAVDataset(
+            dataset_folder, val_filenames, self.opt.height, self.opt.width,
+            self.opt.frame_ids, 4, is_train=False, img_ext=img_ext, mixing=mixing)
+
+            datasets_tuples.append((train_dataset,val_dataset))
+
+        if "icl" in datasets_to_treat:
+            train_filenames = []
+            val_filenames = []
+            dataset_folder = os.path.join(self.opt.data_path,"ICL_NUIM")
+            for folder in os.listdir(dataset_folder):
+                if ".py" not in folder:
+                    fpath = os.path.join(os.path.dirname(__file__), dataset_folder, folder, "new_data.txt")
+                    newlines = readlines(fpath)[1:-1]
+                    newlines = [[line.split(' ')[0],folder+'/rgb',line.split(' ')[1]] for line in newlines]
+                    if "validation" in folder:
+                        val_filenames = [*val_filenames, *newlines]
+                    else:    
+                        train_filenames = [*train_filenames, *newlines]
+
+            num_train_samples = len(train_filenames) if num_train_samples == 0 or num_train_samples > len(train_filenames) else num_train_samples
+            train_dataset = datasets.ICLDataset(
+            dataset_folder, train_filenames, self.opt.height, self.opt.width,
+            self.opt.frame_ids, 4, is_train=True, img_ext=img_ext)
+            val_dataset = datasets.ICLDataset(
+            dataset_folder, val_filenames, self.opt.height, self.opt.width,
+            self.opt.frame_ids, 4, is_train=False, img_ext=img_ext)
+
+            datasets_tuples.append((train_dataset,val_dataset))
+
+        # For dataset mixing, we treat the size of the smallest dataset times all datasets.
+        self.num_total_steps = num_train_samples * len(datasets_tuples) // self.opt.batch_size * self.opt.num_epochs
+
+        if len(datasets_tuples) == 1:
+            self.train_loader = DataLoader(
+                train_dataset, self.opt.batch_size, True,
+                num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+            self.val_loader = DataLoader(
+                val_dataset, self.opt.batch_size, True,
+                num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+        else:
+            concat_dataset = [ConcatDataset([ds_tuple[0] for ds_tuple in datasets_tuples]), 
+                              ConcatDataset([ds_tuple[1] for ds_tuple in datasets_tuples])]
+            self.train_loader = DataLoader(
+                concat_dataset[0], self.opt.batch_size, False, sampler=BatchSchedulerSampler(dataset=concat_dataset[0],
+                batch_size=self.opt.batch_size), num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
+            self.val_loader = DataLoader(
+                concat_dataset[1], self.opt.batch_size, False, sampler=BatchSchedulerSampler(dataset=concat_dataset[1],
+                batch_size=self.opt.batch_size), num_workers=self.opt.num_workers, pin_memory=True, drop_last=True)
         self.val_iter = iter(self.val_loader)
 
         self.writers = {}
@@ -161,11 +270,14 @@ class Trainer:
         self.depth_metric_names = [
             "de/abs_rel", "de/sq_rel", "de/rms", "de/log_rms", "da/a1", "da/a2", "da/a3"]
 
-        print("Using split:\n  ", self.opt.split)
-        print("There are {:d} training items and {:d} validation items\n".format(
-            len(train_dataset), len(val_dataset)))
+        if not mixing:
+            print("There are {:d} training items and {:d} validation items\n".format(
+                len(train_dataset), len(val_dataset)))
+        else:
+            print("All datasets loaded.")
 
         self.save_opts()
+        torch.cuda.empty_cache()
 
     def set_train(self):
         """Convert all models to training mode
@@ -466,7 +578,7 @@ class Trainer:
             if not self.opt.disable_automasking:
                 # add random numbers to break ties
                 identity_reprojection_loss += torch.randn(
-                    identity_reprojection_loss.shape, device=self.device) * 0.00001
+                    identity_reprojection_loss.shape).cuda() * 0.00001
 
                 combined = torch.cat((identity_reprojection_loss, reprojection_loss), dim=1)
             else:

@@ -3,9 +3,12 @@ from __future__ import absolute_import, division, print_function
 import os
 import cv2
 import numpy as np
+import sys
 
 import torch
 from torch.utils.data import DataLoader
+from torchvision.utils import save_image
+from numpy import savetxt
 
 from layers import disp_to_depth
 from utils import readlines
@@ -59,12 +62,13 @@ def batch_post_process_disparity(l_disp, r_disp):
 def evaluate(opt):
     """Evaluates a pretrained model using a specified test set
     """
+
     MIN_DEPTH = 1e-3
     MAX_DEPTH = 80
 
     assert sum((opt.eval_mono, opt.eval_stereo)) == 1, \
         "Please choose mono or stereo evaluation by setting either --eval_mono or --eval_stereo"
-
+    
     if opt.ext_disp_to_eval is None:
 
         opt.load_weights_folder = os.path.expanduser(opt.load_weights_folder)
@@ -110,6 +114,9 @@ def evaluate(opt):
                 if opt.post_process:
                     # Post-processed results require each image to have two forward passes
                     input_color = torch.cat((input_color, torch.flip(input_color, [3])), 0)
+                
+                #save_image(input_color,'test_depth.png')
+                #sys.exit()
 
                 output = depth_decoder(encoder(input_color))
 
@@ -121,6 +128,10 @@ def evaluate(opt):
                     pred_disp = batch_post_process_disparity(pred_disp[:N], pred_disp[N:, :, ::-1])
 
                 pred_disps.append(pred_disp)
+                #print(pred_disp.shape)
+                #cv2.imwrite(pred_disp,'result_kitti.png')
+                #sys.exit()
+                
 
         pred_disps = np.concatenate(pred_disps)
 
@@ -161,9 +172,12 @@ def evaluate(opt):
 
         print("-> No ground truth is available for the KITTI benchmark, so not evaluating. Done.")
         quit()
-
+    
     gt_path = os.path.join(splits_dir, opt.eval_split, "gt_depths.npz")
-    gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1')["data"]
+    gt_depths = np.load(gt_path, fix_imports=True, encoding='latin1', allow_pickle=True)["data"]
+    #print(gt_depths[1].shape)
+    #savetxt('depth_kitti.txt', gt_depths[0], fmt='%1.1f')
+    #sys.exit()
 
     print("-> Evaluating")
 
@@ -175,10 +189,12 @@ def evaluate(opt):
     else:
         print("   Mono evaluation - using median scaling")
 
+
     errors = []
     ratios = []
 
     for i in range(pred_disps.shape[0]):
+    #for i in range(10):
 
         gt_depth = gt_depths[i]
         gt_height, gt_width = gt_depth.shape[:2]
@@ -189,7 +205,8 @@ def evaluate(opt):
 
         if opt.eval_split == "eigen":
             mask = np.logical_and(gt_depth > MIN_DEPTH, gt_depth < MAX_DEPTH)
-
+            #print(mask)
+            #sys.exit()
             crop = np.array([0.40810811 * gt_height, 0.99189189 * gt_height,
                              0.03594771 * gt_width,  0.96405229 * gt_width]).astype(np.int32)
             crop_mask = np.zeros(mask.shape)

@@ -17,11 +17,14 @@ import torch.utils.data as data
 from torchvision import transforms
 
 
-def pil_loader(path):
+def pil_loader(path,mixing):
     # open path as file to avoid ResourceWarning
     # (https://github.com/python-pillow/Pillow/issues/835)
     with open(path, 'rb') as f:
         with Image.open(f) as img:
+            if mixing:
+                img = img.resize((1590,480))
+                img = img.crop((475,0,475+640,480))
             return img.convert('RGB')
 
 
@@ -46,7 +49,8 @@ class MonoDataset(data.Dataset):
                  frame_idxs,
                  num_scales,
                  is_train=False,
-                 img_ext='.jpg'):
+                 img_ext='.jpg',
+                 mixing=False):
         super(MonoDataset, self).__init__()
 
         self.data_path = data_path
@@ -55,6 +59,7 @@ class MonoDataset(data.Dataset):
         self.width = width
         self.num_scales = num_scales
         self.interp = Image.ANTIALIAS
+        self.mixing = mixing
 
         self.frame_idxs = frame_idxs
 
@@ -173,8 +178,7 @@ class MonoDataset(data.Dataset):
             inputs[("inv_K", scale)] = torch.from_numpy(inv_K)
 
         if do_color_aug:
-            color_aug = transforms.ColorJitter.get_params(
-                self.brightness, self.contrast, self.saturation, self.hue)
+            color_aug = transforms.ColorJitter( self.brightness, self.contrast, self.saturation, self.hue)
         else:
             color_aug = (lambda x: x)
 

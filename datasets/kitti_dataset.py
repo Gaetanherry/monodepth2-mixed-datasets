@@ -26,15 +26,25 @@ class KITTIDataset(MonoDataset):
         # by 1 / image_height. Monodepth2 assumes a principal point to be exactly centered.
         # If your principal point is far from the center you might need to disable the horizontal
         # flip augmentation.
-        self.K = np.array([[0.58, 0, 0.5, 0],
+        
+        if self.mixing: # We crop and resize
+            self.K = np.array([[0.58, 0, 0.5, 0],
                            [0, 1.92, 0.5, 0],
                            [0, 0, 1, 0],
                            [0, 0, 0, 1]], dtype=np.float32)
 
-        self.full_res_shape = (1242, 375)
+            self.full_res_shape = (640, 480)
+        else:
+            self.K = np.array([[0.58, 0, 0.5, 0],
+                           [0, 1.92, 0.5, 0],
+                           [0, 0, 1, 0],
+                           [0, 0, 0, 1]], dtype=np.float32)
+
+            self.full_res_shape = (1242, 375)
         self.side_map = {"2": 2, "3": 3, "l": 2, "r": 3}
 
     def check_depth(self):
+        return False 
         line = self.filenames[0].split()
         scene_name = line[0]
         frame_index = int(line[1])
@@ -47,7 +57,7 @@ class KITTIDataset(MonoDataset):
         return os.path.isfile(velo_filename)
 
     def get_color(self, folder, frame_index, side, do_flip):
-        color = self.loader(self.get_image_path(folder, frame_index, side))
+        color = self.loader(self.get_image_path(folder, frame_index, side),self.mixing)
 
         if do_flip:
             color = color.transpose(pil.FLIP_LEFT_RIGHT)
@@ -68,6 +78,7 @@ class KITTIRAWDataset(KITTIDataset):
         return image_path
 
     def get_depth(self, folder, frame_index, side, do_flip):
+        assert False, "Do not use depth" 
         calib_path = os.path.join(self.data_path, folder.split("/")[0])
 
         velo_filename = os.path.join(
